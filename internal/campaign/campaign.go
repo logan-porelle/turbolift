@@ -38,15 +38,15 @@ type Campaign struct {
 	PrBody  string
 }
 
-type CampainOptions struct {
+type CampaignOptions struct {
 	RepoFilename string
 }
 
-func NewCampaignOptions() *CampainOptions {
-	return &CampainOptions{RepoFilename: "repos.txt"}
+func NewCampaignOptions() *CampaignOptions {
+	return &CampaignOptions{RepoFilename: "repos.txt"}
 }
 
-func OpenCampaign(options *CampainOptions) (*Campaign, error) {
+func OpenCampaign(options *CampaignOptions) (*Campaign, error) {
 	dir, _ := os.Getwd()
 	dirBasename := filepath.Base(dir)
 
