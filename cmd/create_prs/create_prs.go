@@ -16,22 +16,28 @@
 package create_prs
 
 import (
+	"os"
+	"path"
+	"time"
+
 	"github.com/skyscanner/turbolift/internal/campaign"
 	"github.com/skyscanner/turbolift/internal/colors"
 	"github.com/skyscanner/turbolift/internal/git"
 	"github.com/skyscanner/turbolift/internal/github"
 	"github.com/skyscanner/turbolift/internal/logging"
 	"github.com/spf13/cobra"
-	"os"
-	"path"
-	"time"
 )
 
-var gh github.GitHub = github.NewRealGitHub()
-var g git.Git = git.NewRealGit()
+var (
+	gh github.GitHub = github.NewRealGitHub()
+	g  git.Git       = git.NewRealGit()
+)
 
-var sleep time.Duration
-var isDraft bool
+var (
+	isDraft  bool
+	repoFile string
+	sleep    time.Duration
+)
 
 func NewCreatePRsCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -42,6 +48,7 @@ func NewCreatePRsCmd() *cobra.Command {
 
 	cmd.Flags().DurationVar(&sleep, "sleep", 0, "Fixed sleep in between PR creations (to spread load on CI infrastructure)")
 	cmd.Flags().BoolVar(&isDraft, "draft", false, "Creates the Pull Request as Draft PR")
+	cmd.Flags().StringVar(&repoFile, "repos", "repos.txt", "A file containing a list of repositories to clone.")
 
 	return cmd
 }
@@ -50,7 +57,9 @@ func run(c *cobra.Command, _ []string) {
 	logger := logging.NewLogger(c)
 
 	readCampaignActivity := logger.StartActivity("Reading campaign data")
-	dir, err := campaign.OpenCampaign()
+	defaultOptions := campaign.NewCampaignOptions()
+	defaultOptions.RepoFilename = repoFile
+	dir, err := campaign.OpenCampaign(defaultOptions)
 	if err != nil {
 		readCampaignActivity.EndWithFailure(err)
 		return

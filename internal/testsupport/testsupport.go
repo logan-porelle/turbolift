@@ -31,7 +31,6 @@ func Pwd() string {
 func CreateAndEnterTempDirectory() {
 	tempDir, _ := ioutil.TempDir("", "turbolift-test-*")
 	err := os.Chdir(tempDir)
-
 	if err != nil {
 		panic(err)
 	}
@@ -58,6 +57,14 @@ func PrepareTempCampaign(createDirs bool, repos ...string) {
 
 	dummyPrDescription := "# PR title\nPR body"
 	err = ioutil.WriteFile("README.md", []byte(dummyPrDescription), os.ModePerm|0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func CreateAnotherRepoFile(filename string, repos ...string) {
+	delimitedList := strings.Join(repos, "\n")
+	err := ioutil.WriteFile(filename, []byte(delimitedList), os.ModePerm|0644)
 	if err != nil {
 		panic(err)
 	}
